@@ -4,7 +4,7 @@ A symbolic-numeric expression runtime for Python with EML lowering.
 
 Build mathematical expressions as Python objects, then evaluate, differentiate, simplify, compile to fast callables, or lower to a universal representation where every expression becomes a tree of a single binary operator.
 
-Based off of the work and research presented in the paper "All elementary functions from a single operator" - https://arxiv.org/pdf/2603.21852
+Based off of the work and research presented in the paper "All elementary functions from a single operator" - (Odrzywolek, 2026) https://arxiv.org/pdf/2603.21852
 
 ## Features
 
