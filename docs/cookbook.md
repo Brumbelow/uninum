@@ -42,13 +42,13 @@ print(f"f'' = {f_double_prime}")
 
 ```python
 import numpy as np
-from uninum import var, sin, compile
+from uninum import var, sin, compile_expr
 
 x = var("x")
 y = var("y")
 f = sin(x) * y ** 2
 
-fn = compile(f, backend="numpy")
+fn = compile_expr(f, backend="numpy")
 
 xs = np.linspace(0, 2 * np.pi, 100)
 ys = np.linspace(0, 3, 100)

@@ -2,11 +2,12 @@
 
 import cmath
 import operator
+import warnings
 
-from .expr import Expr, Const, Var, UnaryOp, BinOp
+from .expr import Expr, Const, Var, UnaryOp, BinOp, _safe_exp, _safe_log
 
 
-def compile(expr, backend="numpy"):
+def compile_expr(expr, backend="numpy"):
     """Compile *expr* into a callable ``f(**kwargs) -> value``.
 
     Parameters
@@ -82,8 +83,8 @@ def compile(expr, backend="numpy"):
         }
     elif backend == "python":
         ufns = {
-            "exp": cmath.exp,
-            "ln": cmath.log,
+            "exp": _safe_exp,
+            "ln": _safe_log,
             "sin": cmath.sin,
             "cos": cmath.cos,
             "tan": cmath.tan,
@@ -104,7 +105,7 @@ def compile(expr, backend="numpy"):
             "mul": operator.mul,
             "div": operator.truediv,
             "pow": operator.pow,
-            "eml": lambda x, y: cmath.exp(x) - cmath.log(y),
+            "eml": lambda x, y: _safe_exp(x) - _safe_log(y),
         }
     else:
         raise ValueError(f"Unknown backend: {backend!r}")
@@ -126,3 +127,14 @@ def compile(expr, backend="numpy"):
         return results[result_idx]
 
     return run
+
+
+def compile(expr, backend="numpy"):
+    """Deprecated alias for :func:`compile_expr`."""
+    warnings.warn(
+        "uninum.compile() is deprecated (shadows builtin). "
+        "Use uninum.compile_expr() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return compile_expr(expr, backend=backend)

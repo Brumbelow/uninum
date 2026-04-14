@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uninum"
-version = "0.1.0"
+version = "0.2.0"
 description = "Unified symbolic-numeric expression runtime with EML lowering"
 requires-python = ">=3.10"
 

@@ -5,6 +5,8 @@ import cmath
 import pytest
 
 from uninum import var, Const, Var, sin, cos, exp, ln, sqrt, eml, e, pi, I
+from uninum import tan, asin, acos, atan, sinh, cosh, tanh
+from uninum.expr import UnaryOp, BinOp
 
 
 # ---------------------------------------------------------------------------
@@ -206,3 +208,129 @@ class TestEvaluation:
         # eml(1, 1) = exp(1) - ln(1) = e
         expr = eml(1, 1)
         assert expr.evaluate() == pytest.approx(math.e)
+
+    def test_tan(self):
+        x = var("x")
+        assert tan(x).evaluate(x=1.0) == pytest.approx(math.tan(1.0))
+
+    def test_asin(self):
+        x = var("x")
+        assert asin(x).evaluate(x=0.5) == pytest.approx(math.asin(0.5))
+
+    def test_acos(self):
+        x = var("x")
+        assert acos(x).evaluate(x=0.5) == pytest.approx(math.acos(0.5))
+
+    def test_atan(self):
+        x = var("x")
+        assert atan(x).evaluate(x=1.0) == pytest.approx(math.atan(1.0))
+
+    def test_sinh(self):
+        x = var("x")
+        assert sinh(x).evaluate(x=1.0) == pytest.approx(math.sinh(1.0))
+
+    def test_cosh(self):
+        x = var("x")
+        assert cosh(x).evaluate(x=1.0) == pytest.approx(math.cosh(1.0))
+
+    def test_tanh(self):
+        x = var("x")
+        assert tanh(x).evaluate(x=1.0) == pytest.approx(math.tanh(1.0))
+
+
+# ---------------------------------------------------------------------------
+# Structural equality and hashing
+# ---------------------------------------------------------------------------
+
+class TestEquality:
+    def test_var_eq(self):
+        assert Var("x") == Var("x")
+
+    def test_var_neq(self):
+        assert Var("x") != Var("y")
+
+    def test_const_eq(self):
+        assert Const(1) == Const(1)
+
+    def test_const_int_float_eq(self):
+        assert Const(1) == Const(1.0)
+
+    def test_const_neq(self):
+        assert Const(1) != Const(2)
+
+    def test_unary_eq(self):
+        assert UnaryOp("sin", Var("x")) == UnaryOp("sin", Var("x"))
+
+    def test_unary_neq_op(self):
+        assert UnaryOp("sin", Var("x")) != UnaryOp("cos", Var("x"))
+
+    def test_unary_neq_arg(self):
+        assert UnaryOp("sin", Var("x")) != UnaryOp("sin", Var("y"))
+
+    def test_binop_eq(self):
+        assert BinOp("add", Var("x"), Var("y")) == BinOp("add", Var("x"), Var("y"))
+
+    def test_binop_neq_op(self):
+        assert BinOp("add", Var("x"), Var("y")) != BinOp("sub", Var("x"), Var("y"))
+
+    def test_binop_neq_children(self):
+        assert BinOp("add", Var("x"), Var("y")) != BinOp("add", Var("y"), Var("x"))
+
+    def test_cross_type_neq(self):
+        assert not (Const(1) == Var("x"))
+        assert not (Var("x") == Const(1))
+
+    def test_non_expr_neq(self):
+        assert not (Var("x") == "x")
+        assert not (Const(1) == 1)
+
+    def test_hash_consistency(self):
+        assert hash(Var("x")) == hash(Var("x"))
+        assert hash(Const(1)) == hash(Const(1.0))
+        assert hash(UnaryOp("sin", Var("x"))) == hash(UnaryOp("sin", Var("x")))
+
+    def test_usable_in_set(self):
+        s = {Var("x"), Var("x"), Var("y")}
+        assert len(s) == 2
+
+    def test_usable_in_dict(self):
+        d = {Var("x"): 1, Var("y"): 2}
+        assert d[Var("x")] == 1
+
+    def test_compound_eq(self):
+        x, y = Var("x"), Var("y")
+        e1 = BinOp("add", UnaryOp("sin", x), BinOp("mul", x, y))
+        e2 = BinOp("add", UnaryOp("sin", Var("x")), BinOp("mul", Var("x"), Var("y")))
+        assert e1 == e2
+        assert hash(e1) == hash(e2)
+
+
+# ---------------------------------------------------------------------------
+# free_vars
+# ---------------------------------------------------------------------------
+
+class TestFreeVars:
+    def test_const(self):
+        assert Const(1).free_vars() == set()
+
+    def test_var(self):
+        assert Var("x").free_vars() == {"x"}
+
+    def test_binary(self):
+        x, y = var("x"), var("y")
+        assert (x + y).free_vars() == {"x", "y"}
+
+    def test_unary(self):
+        x = var("x")
+        assert sin(x).free_vars() == {"x"}
+
+    def test_compound(self):
+        x, y = var("x"), var("y")
+        assert (sin(x * y) + ln(x)).free_vars() == {"x", "y"}
+
+    def test_repeated_var(self):
+        x = var("x")
+        assert (x + x * x).free_vars() == {"x"}
+
+    def test_no_vars(self):
+        assert (Const(1) + Const(2)).free_vars() == set()

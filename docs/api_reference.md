@@ -100,7 +100,7 @@ x = var("x")
 expr = e ** (I * x)     # Euler's formula
 ```
 
-## `compile(expr, backend="numpy")`
+## `compile_expr(expr, backend="numpy")`
 
 Compile an expression tree into a fast callable function.
 
@@ -111,14 +111,14 @@ Compile an expression tree into a fast callable function.
 **Returns:** a callable `f(**kwargs) -> value`
 
 ```python
-from uninum import var, sin, compile
+from uninum import var, sin, compile_expr
 
 x = var("x")
-fn = compile(sin(x) + x ** 2, backend="python")
+fn = compile_expr(sin(x) + x ** 2, backend="python")
 fn(x=1.5)    # scalar result
 ```
 
-**Note:** `compile` shadows Python's builtin `compile`. If you need both, use `from uninum import compile as ucompile`.
+**Note:** `compile` is available as a deprecated alias for `compile_expr`.
 
 **Backend differences:**
 - **numpy** -- Uses numpy ufuncs. Accepts and returns numpy arrays for vectorized computation. Requires numpy to be installed.

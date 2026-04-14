@@ -12,29 +12,11 @@ def simplify(expr, max_passes=10):
     cur = expr
     for _ in range(max_passes):
         nxt = _simplify_once(cur)
-        if _struct_eq(nxt, cur):
+        if nxt == cur:
             return nxt
         prev = cur
         cur = nxt
     return cur
-
-
-# ---------------------------------------------------------------------------
-# Structural equality
-# ---------------------------------------------------------------------------
-
-def _struct_eq(a, b):
-    if type(a) is not type(b):
-        return False
-    if isinstance(a, Const):
-        return a.value == b.value
-    if isinstance(a, Var):
-        return a.name == b.name
-    if isinstance(a, UnaryOp):
-        return a.op == b.op and _struct_eq(a.arg, b.arg)
-    if isinstance(a, BinOp):
-        return a.op == b.op and _struct_eq(a.left, b.left) and _struct_eq(a.right, b.right)
-    return False
 
 
 # ---------------------------------------------------------------------------
@@ -143,7 +125,7 @@ def _simplify_binary(op, left, right):
         if _is_const(left, 0):
             return UnaryOp("neg", right)
         # x - x -> 0
-        if _struct_eq(left, right):
+        if left == right:
             return Const(0)
         # x - (-y) -> x + y
         if isinstance(right, UnaryOp) and right.op == "neg":
@@ -168,7 +150,7 @@ def _simplify_binary(op, left, right):
         if _is_const(left, 0):
             return Const(0)
         # x / x -> 1
-        if _struct_eq(left, right):
+        if left == right:
             return Const(1)
 
     # --- power identities ---

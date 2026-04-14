@@ -1,6 +1,6 @@
 """Compiling expressions to fast callables with uninum."""
 
-from uninum import var, sin, cos, exp, ln, compile  # note: shadows builtin compile
+from uninum import var, sin, cos, exp, ln, compile_expr
 
 x = var("x")
 y = var("y")
@@ -11,7 +11,7 @@ expr = (x + y) * sin(x) / ln(y)
 
 print("=== Python backend ===")
 
-fn = compile(expr, backend="python")
+fn = compile_expr(expr, backend="python")
 result = fn(x=1.2, y=3.4)
 
 # The python backend uses cmath internally, so results may be complex.
@@ -28,7 +28,7 @@ print(f"evaluate(1.2, 3.4) = {expr.evaluate(x=1.2, y=3.4):.10f}")
 print("\n=== Compiling a derivative ===")
 
 df = expr.diff(x).simplify()
-fn_deriv = compile(df, backend="python")
+fn_deriv = compile_expr(df, backend="python")
 result_d = fn_deriv(x=1.2, y=3.4)
 if isinstance(result_d, complex):
     result_d = result_d.real
@@ -42,7 +42,7 @@ print("\n=== NumPy backend ===")
 try:
     import numpy as np
 
-    fn_np = compile(expr, backend="numpy")
+    fn_np = compile_expr(expr, backend="numpy")
 
     # Scalar evaluation
     print(f"scalar: {fn_np(x=1.2, y=3.4):.10f}")
@@ -68,7 +68,7 @@ print("the compiler evaluates it only once.")
 shared = sin(x) + cos(x)
 expr2 = shared * shared  # shared is the *same* object in both operands
 
-fn2 = compile(expr2, backend="python")
+fn2 = compile_expr(expr2, backend="python")
 r = fn2(x=1.0)
 if isinstance(r, complex):
     r = r.real
@@ -77,6 +77,6 @@ print(f"(sin(x) + cos(x))^2 at x=1: {r:.10f}")
 # --- Performance note ---
 
 print("\n=== How compilation works ===")
-print("compile() flattens the expression tree into a linear operation list,")
+print("compile_expr() flattens the expression tree into a linear operation list,")
 print("then builds a closure that evaluates the list sequentially.")
 print("This avoids the overhead of recursive tree-walking on every call.")

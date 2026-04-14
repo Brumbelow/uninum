@@ -27,7 +27,7 @@ Requires Python >= 3.10.
 ## Quickstart
 
 ```python
-from uninum import var, sin, ln, compile
+from uninum import var, sin, ln, compile_expr
 
 x = var("x")
 y = var("y")
@@ -44,7 +44,7 @@ df = expr.diff(x).simplify()
 print(df)
 
 # Compile to a fast callable
-fn = compile(expr, backend="python")     # note: shadows builtin compile
+fn = compile_expr(expr, backend="python")
 print(fn(x=1.2, y=3.4))
 
 # Lower to pure EML form
@@ -73,7 +73,7 @@ print(lowered.evaluate(x=1.2, y=3.4))   # same result
 | | `.diff(wrt)` | Symbolic derivative (accepts `Var` or `str`) |
 | | `.simplify()` | Algebraic simplification |
 | | `.to_eml()` | Lower to pure EML representation |
-| **Compilation** | `compile(expr, backend)` | Compile to callable; `"numpy"` or `"python"` |
+| **Compilation** | `compile_expr(expr, backend)` | Compile to callable; `"numpy"` or `"python"` |
 
 ## EML in 30 Seconds
 

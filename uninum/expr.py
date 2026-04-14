@@ -175,6 +175,23 @@ class Expr:
 
         return to_eml(self)
 
+    # -- inspection --
+
+    def free_vars(self):
+        """Return the set of variable names in this expression."""
+        result = set()
+        stack = [self]
+        while stack:
+            node = stack.pop()
+            if isinstance(node, Var):
+                result.add(node.name)
+            elif isinstance(node, UnaryOp):
+                stack.append(node.arg)
+            elif isinstance(node, BinOp):
+                stack.append(node.left)
+                stack.append(node.right)
+        return result
+
     # -- evaluation --
 
     def evaluate(self, **kwargs):
@@ -194,6 +211,14 @@ class Const(Expr):
     def __init__(self, value, name=None):
         self.value = value
         self.name = name
+
+    def __eq__(self, other):
+        if not isinstance(other, Const):
+            return NotImplemented
+        return self.value == other.value
+
+    def __hash__(self):
+        return hash(("Const", self.value))
 
     def __str__(self):
         if self.name:
@@ -227,6 +252,14 @@ class Var(Expr):
     def __init__(self, name):
         self.name = name
 
+    def __eq__(self, other):
+        if not isinstance(other, Var):
+            return NotImplemented
+        return self.name == other.name
+
+    def __hash__(self):
+        return hash(("Var", self.name))
+
     def __str__(self):
         return self.name
 
@@ -245,6 +278,14 @@ class UnaryOp(Expr):
     def __init__(self, op, arg):
         self.op = op
         self.arg = arg
+
+    def __eq__(self, other):
+        if not isinstance(other, UnaryOp):
+            return NotImplemented
+        return self.op == other.op and self.arg == other.arg
+
+    def __hash__(self):
+        return hash(("UnaryOp", self.op, self.arg))
 
     def __str__(self):
         if self.op == "neg":
@@ -271,6 +312,14 @@ class BinOp(Expr):
         self.op = op
         self.left = left
         self.right = right
+
+    def __eq__(self, other):
+        if not isinstance(other, BinOp):
+            return NotImplemented
+        return self.op == other.op and self.left == other.left and self.right == other.right
+
+    def __hash__(self):
+        return hash(("BinOp", self.op, self.left, self.right))
 
     def __str__(self):
         if self.op == "eml":

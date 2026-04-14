@@ -25,7 +25,7 @@ from .expr import (
     pi,
     I,
 )
-from .compile import compile
+from .compile import compile_expr, compile
 
 __all__ = [
     "Expr",
@@ -51,5 +51,6 @@ __all__ = [
     "e",
     "pi",
     "I",
+    "compile_expr",
     "compile",
 ]

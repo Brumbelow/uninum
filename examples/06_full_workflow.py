@@ -4,7 +4,7 @@ This example puts all of uninum's features together on two concrete
 mathematical problems.
 """
 
-from uninum import var, sin, cos, exp, ln, compile  # note: shadows builtin compile
+from uninum import var, sin, cos, exp, ln, compile_expr
 
 x = var("x")
 y = var("y")
@@ -40,8 +40,8 @@ for val in [0.5, 1.0, 1.5, 2.0]:
     print(f"  f'({val}) = {result:.8f}")
 
 # Compile both
-fn_f = compile(f, backend="python")
-fn_df = compile(df, backend="python")
+fn_f = compile_expr(f, backend="python")
+fn_df = compile_expr(df, backend="python")
 
 print("\n--- Compiled evaluation ---")
 r1 = fn_f(x=1.0)
@@ -99,9 +99,9 @@ print(f"  dg/dx   = {dg_dx_val:.8f}")
 print(f"  dg/dy   = {dg_dy_val:.8f}")
 
 # Compile all three
-fn_g = compile(g, backend="python")
-fn_dg_dx = compile(dg_dx, backend="python")
-fn_dg_dy = compile(dg_dy, backend="python")
+fn_g = compile_expr(g, backend="python")
+fn_dg_dx = compile_expr(dg_dx, backend="python")
+fn_dg_dy = compile_expr(dg_dy, backend="python")
 
 print(f"\n--- Compiled evaluation ---")
 r_g = fn_g(x=x0, y=y0)
@@ -119,7 +119,7 @@ print(f"\n--- NumPy vectorized ---")
 try:
     import numpy as np
 
-    fn_g_np = compile(g, backend="numpy")
+    fn_g_np = compile_expr(g, backend="numpy")
     xs = np.linspace(0.5, 2.0, 4)
     ys = np.full_like(xs, 2.0)
     results = fn_g_np(x=xs, y=ys)
