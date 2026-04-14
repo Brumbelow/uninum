@@ -16,13 +16,17 @@ Based off of the work and research presented in the paper "All elementary functi
 
 ## Install
 
+Requires Python >= 3.10.
+
 ```bash
+python -m venv .venv
+source .venv/bin/activate      # Linux/macOS
+# .venv\Scripts\activate       # Windows
+
 pip install .                  # core
 pip install .[numpy]           # with numpy backend support
 pip install .[dev]             # with pytest for running tests
 ```
-
-Requires Python >= 3.10.
 
 ## Quickstart
 
