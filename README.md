@@ -83,7 +83,7 @@ print(lowered.evaluate(x=1.2, y=3.4))   # same result
 
 ## EML in 30 Seconds
 
-The EML operator `eml(x, y) = exp(x) - ln(y)` is a single binary function that, combined with the constant 1, can express all elementary mathematics. This was shown by Odrzywolek (2024).
+The EML operator `eml(x, y) = exp(x) - ln(y)` is a single binary function that, combined with the constant 1, can express all elementary mathematics. This was shown by Odrzywolek (2026).
 
 ```python
 from uninum import var, sin, exp
