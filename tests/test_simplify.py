@@ -2,7 +2,7 @@
 
 import pytest
 
-from uninum import var, Const, sin, cos, exp, ln
+from uninum import var, Const, sin, cos, tan, exp, ln
 
 
 class TestSimplify:
@@ -129,6 +129,92 @@ class TestSimplify:
         y = var("y")
         expr = x - (-y)
         assert str(expr.simplify()) == "x + y"
+
+    # --- like-term collection ---
+
+    def test_add_same_var(self):
+        x = var("x")
+        expr = x + x
+        assert str(expr.simplify()) == "2 * x"
+
+    def test_add_coeff_terms(self):
+        x = var("x")
+        expr = Const(2) * x + Const(3) * x
+        assert str(expr.simplify()) == "5 * x"
+
+    def test_sub_like_terms(self):
+        x = var("x")
+        expr = Const(3) * x - x
+        assert str(expr.simplify()) == "2 * x"
+
+    def test_sub_to_zero(self):
+        x = var("x")
+        expr = Const(2) * x - Const(2) * x
+        assert str(expr.simplify()) == "0"
+
+    def test_add_neg_like_terms(self):
+        x = var("x")
+        expr = (-x) + Const(3) * x
+        # (-x) + 3*x -> (3*x) - x  [neg absorption]  -> 2*x [like-term]
+        assert str(expr.simplify()) == "2 * x"
+
+    # --- power combination ---
+
+    def test_mul_same_var(self):
+        x = var("x")
+        expr = x * x
+        assert str(expr.simplify()) == "x ** 2"
+
+    def test_mul_same_base_pow(self):
+        x = var("x")
+        expr = (x ** Const(2)) * (x ** Const(3))
+        assert str(expr.simplify()) == "x ** 5"
+
+    def test_mul_var_and_pow(self):
+        x = var("x")
+        expr = x * (x ** Const(2))
+        assert str(expr.simplify()) == "x ** 3"
+
+    def test_pow_of_pow(self):
+        x = var("x")
+        expr = (x ** Const(2)) ** Const(3)
+        assert str(expr.simplify()) == "x ** 6"
+
+    # --- negation distribution ---
+
+    def test_neg_add(self):
+        x = var("x")
+        y = var("y")
+        expr = -(x + y)
+        assert str(expr.simplify()) == "-x - y"
+
+    def test_neg_sub(self):
+        x = var("x")
+        y = var("y")
+        expr = -(x - y)
+        assert str(expr.simplify()) == "y - x"
+
+    def test_neg_mul(self):
+        x = var("x")
+        expr = -(Const(2) * x)
+        assert str(expr.simplify()) == "-2 * x"
+
+    # --- trig parity ---
+
+    def test_sin_neg(self):
+        x = var("x")
+        expr = sin(-x)
+        assert str(expr.simplify()) == "-sin(x)"
+
+    def test_cos_neg(self):
+        x = var("x")
+        expr = cos(-x)
+        assert str(expr.simplify()) == "cos(x)"
+
+    def test_tan_neg(self):
+        x = var("x")
+        expr = tan(-x)
+        assert str(expr.simplify()) == "-tan(x)"
 
     # --- compound ---
 

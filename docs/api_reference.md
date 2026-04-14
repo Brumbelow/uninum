@@ -29,6 +29,8 @@ All operators accept `Expr`, `int`, `float`, or `complex` on either side. Python
 
 - **`.to_eml()`** -- Lower to a pure EML representation. Returns an `Expr` tree containing only `Const(1)`, `Var`, and `BinOp("eml", ...)`.
 
+- **`.to_latex()`** -- Render the expression as a LaTeX math string. Handles fractions, powers, Greek variable names, named constants, and all supported operators.
+
 ### `Const(value, name=None)`
 
 A numeric constant.
@@ -173,3 +175,32 @@ The simplifier performs bottom-up rewriting with up to 10 passes until a fixpoin
 **Inverse cancellation:** `exp(ln(x)) -> x`, `ln(exp(x)) -> x`
 
 **Sign normalization:** `x + (-y) -> x - y`, `x - (-y) -> x + y`
+
+**Like-term collection:** `x + x -> 2*x`, `2*x + 3*x -> 5*x`, `a*x - b*x -> (a-b)*x`
+
+**Power combination:** `x * x -> x^2`, `x^a * x^b -> x^(a+b)`, `x * x^a -> x^(a+1)`, `(x^a)^b -> x^(a*b)`
+
+**Negation distribution:** `-(x + y) -> -x - y`, `-(x - y) -> y - x`, `-(x * y) -> (-x) * y`
+
+**Trig parity:** `sin(-x) -> -sin(x)`, `cos(-x) -> cos(x)`, `tan(-x) -> -tan(x)`
+
+## `to_latex(expr)`
+
+Convert an expression tree to a LaTeX math string. Also available as the `.to_latex()` method on any `Expr`.
+
+**Rendering highlights:**
+- Fractions: `a / b` -> `\frac{a}{b}`
+- Powers: `x ** 2` -> `x^{2}`
+- Greek variables: `Var("alpha")` -> `\alpha`
+- Named constants: `e` -> `\mathrm{e}`, `pi` -> `\pi`, `I` -> `\mathrm{i}`
+- Functions: `sin(x)` -> `\sin\left(x\right)`
+- Square root: `sqrt(x)` -> `\sqrt{x}`
+- EML: `eml(x, y)` -> `\operatorname{eml}\left(x, y\right)`
+
+```python
+from uninum import var, sin, to_latex
+
+x = var("x")
+expr = sin(x) / (x ** 2 + 1)
+print(to_latex(expr))  # \frac{\sin\left(x\right)}{x^{2} + 1}
+```

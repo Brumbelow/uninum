@@ -1,5 +1,7 @@
 """Uninum — unified symbolic-numeric expression runtime with EML lowering."""
 
+__version__ = "0.2.0"
+
 from .expr import (
     Expr,
     Const,
@@ -26,8 +28,10 @@ from .expr import (
     I,
 )
 from .compile import compile_expr, compile
+from .latex import to_latex
 
 __all__ = [
+    "__version__",
     "Expr",
     "Const",
     "Var",
@@ -53,4 +57,5 @@ __all__ = [
     "I",
     "compile_expr",
     "compile",
+    "to_latex",
 ]

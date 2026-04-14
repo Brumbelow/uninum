@@ -175,6 +175,11 @@ class Expr:
 
         return to_eml(self)
 
+    def to_latex(self):
+        from .latex import to_latex
+
+        return to_latex(self)
+
     # -- inspection --
 
     def free_vars(self):

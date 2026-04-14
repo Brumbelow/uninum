@@ -1,6 +1,6 @@
 """Algebraic simplification with uninum."""
 
-from uninum import var, Const, exp, ln, sin
+from uninum import var, Const, exp, ln, sin, cos, tan
 
 x = var("x")
 y = var("y")
@@ -80,6 +80,36 @@ print(f"f       = {f}")
 print(f"f' raw  = {df}")
 print(f"f' simp = {df.simplify()}")
 
+# --- Like-term collection ---
+
+print("\n=== Like-term collection ===")
+print(f"x + x       -> {(x + x).simplify()}")
+print(f"2*x + 3*x   -> {(Const(2) * x + Const(3) * x).simplify()}")
+print(f"3*x - x     -> {(Const(3) * x - x).simplify()}")
+print(f"2*x - 2*x   -> {(Const(2) * x - Const(2) * x).simplify()}")
+
+# --- Power combination ---
+
+print("\n=== Power combination ===")
+print(f"x * x       -> {(x * x).simplify()}")
+print(f"x^2 * x^3   -> {((x ** Const(2)) * (x ** Const(3))).simplify()}")
+print(f"x * x^2     -> {(x * (x ** Const(2))).simplify()}")
+print(f"(x^2)^3     -> {((x ** Const(2)) ** Const(3)).simplify()}")
+
+# --- Negation distribution ---
+
+print("\n=== Negation distribution ===")
+print(f"-(x + y)    -> {(-(x + y)).simplify()}")
+print(f"-(x - y)    -> {(-(x - y)).simplify()}")
+print(f"-(2 * x)    -> {(-(Const(2) * x)).simplify()}")
+
+# --- Trig parity ---
+
+print("\n=== Trig parity ===")
+print(f"sin(-x)     -> {sin(-x).simplify()}")
+print(f"cos(-x)     -> {cos(-x).simplify()}")
+print(f"tan(-x)     -> {tan(-x).simplify()}")
+
 # --- Limitations ---
 
 print("\n=== Limitations ===")
@@ -87,5 +117,5 @@ print("The simplifier handles local algebraic identities.")
 print("It does NOT perform:")
 print("  - Algebraic expansion or factoring")
 print("  - Trigonometric identities (sin^2 + cos^2 = 1)")
-print("  - Canonicalization of equivalent expressions")
+print("  - Commutativity canonicalization (x*y vs y*x)")
 print("  - Symbolic polynomial arithmetic")

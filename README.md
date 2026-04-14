@@ -73,7 +73,9 @@ print(lowered.evaluate(x=1.2, y=3.4))   # same result
 | | `.diff(wrt)` | Symbolic derivative (accepts `Var` or `str`) |
 | | `.simplify()` | Algebraic simplification |
 | | `.to_eml()` | Lower to pure EML representation |
+| | `.to_latex()` | Render as LaTeX math string |
 | **Compilation** | `compile_expr(expr, backend)` | Compile to callable; `"numpy"` or `"python"` |
+| **Rendering** | `to_latex(expr)` | Convert expression to LaTeX |
 
 ## EML in 30 Seconds
 

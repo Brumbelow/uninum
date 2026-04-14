@@ -49,6 +49,37 @@ def _make_const(value):
     return Const(value)
 
 
+def _extract_coeff_base(node):
+    """Decompose a term into (coefficient, base).
+
+    Returns (numeric_coeff, base_expr) where base_expr is None for pure constants.
+    """
+    if isinstance(node, Const):
+        return (node.value, None)
+    if isinstance(node, UnaryOp) and node.op == "neg":
+        c, b = _extract_coeff_base(node.arg)
+        return (-c, b)
+    if isinstance(node, BinOp) and node.op == "mul":
+        if isinstance(node.left, Const):
+            return (node.left.value, node.right)
+        if isinstance(node.right, Const):
+            return (node.right.value, node.left)
+    return (1, node)
+
+
+def _make_term(coeff, base):
+    """Reconstruct an expression from (coefficient, base)."""
+    if base is None:
+        return _make_const(coeff)
+    if coeff == 0:
+        return Const(0)
+    if coeff == 1:
+        return base
+    if coeff == -1:
+        return UnaryOp("neg", base)
+    return BinOp("mul", _make_const(coeff), base)
+
+
 # ---------------------------------------------------------------------------
 # Single-pass bottom-up rewrite
 # ---------------------------------------------------------------------------
@@ -94,6 +125,28 @@ def _simplify_unary(op, arg):
     if op == "neg" and _is_const(arg, 0):
         return Const(0)
 
+    # --- negation distribution ---
+    # -(x + y) -> (-x) - y
+    if op == "neg" and isinstance(arg, BinOp) and arg.op == "add":
+        return BinOp("sub", UnaryOp("neg", arg.left), arg.right)
+    # -(x - y) -> y - x
+    if op == "neg" and isinstance(arg, BinOp) and arg.op == "sub":
+        return BinOp("sub", arg.right, arg.left)
+    # -(x * y) -> (-x) * y
+    if op == "neg" and isinstance(arg, BinOp) and arg.op == "mul":
+        return BinOp("mul", UnaryOp("neg", arg.left), arg.right)
+
+    # --- trig parity ---
+    # sin(-x) -> -sin(x)
+    if op == "sin" and isinstance(arg, UnaryOp) and arg.op == "neg":
+        return UnaryOp("neg", UnaryOp("sin", arg.arg))
+    # cos(-x) -> cos(x)
+    if op == "cos" and isinstance(arg, UnaryOp) and arg.op == "neg":
+        return UnaryOp("cos", arg.arg)
+    # tan(-x) -> -tan(x)
+    if op == "tan" and isinstance(arg, UnaryOp) and arg.op == "neg":
+        return UnaryOp("neg", UnaryOp("tan", arg.arg))
+
     return UnaryOp(op, arg)
 
 
@@ -118,6 +171,11 @@ def _simplify_binary(op, left, right):
         # (-x) + y -> y - x
         if isinstance(left, UnaryOp) and left.op == "neg":
             return BinOp("sub", right, left.arg)
+        # Like-term collection: a*x + b*x -> (a+b)*x
+        lc, lb = _extract_coeff_base(left)
+        rc, rb = _extract_coeff_base(right)
+        if lb is not None and rb is not None and lb == rb:
+            return _make_term(lc + rc, lb)
 
     if op == "sub":
         if _is_const(right, 0):
@@ -130,6 +188,11 @@ def _simplify_binary(op, left, right):
         # x - (-y) -> x + y
         if isinstance(right, UnaryOp) and right.op == "neg":
             return BinOp("add", left, right.arg)
+        # Like-term collection: a*x - b*x -> (a-b)*x
+        lc, lb = _extract_coeff_base(left)
+        rc, rb = _extract_coeff_base(right)
+        if lb is not None and rb is not None and lb == rb:
+            return _make_term(lc - rc, lb)
 
     # --- multiplicative identities ---
     if op == "mul":
@@ -143,6 +206,23 @@ def _simplify_binary(op, left, right):
             return UnaryOp("neg", right)
         if _is_const(right, -1):
             return UnaryOp("neg", left)
+        # x * x -> x ^ 2
+        if left == right:
+            return BinOp("pow", left, Const(2))
+        # x^a * x^b -> x^(a+b)
+        if (isinstance(left, BinOp) and left.op == "pow" and
+                isinstance(right, BinOp) and right.op == "pow" and
+                left.left == right.left):
+            new_exp = _simplify_binary("add", left.right, right.right)
+            return BinOp("pow", left.left, new_exp)
+        # x * x^a -> x^(a+1)
+        if isinstance(right, BinOp) and right.op == "pow" and left == right.left:
+            new_exp = _simplify_binary("add", right.right, Const(1))
+            return BinOp("pow", left, new_exp)
+        # x^a * x -> x^(a+1)
+        if isinstance(left, BinOp) and left.op == "pow" and right == left.left:
+            new_exp = _simplify_binary("add", left.right, Const(1))
+            return BinOp("pow", right, new_exp)
 
     if op == "div":
         if _is_const(right, 1):
@@ -161,5 +241,9 @@ def _simplify_binary(op, left, right):
             return left
         if _is_const(left, 1):
             return Const(1)
+        # (x^a)^b -> x^(a*b)
+        if isinstance(left, BinOp) and left.op == "pow":
+            new_exp = _simplify_binary("mul", left.right, right)
+            return BinOp("pow", left.left, new_exp)
 
     return BinOp(op, left, right)

@@ -149,6 +149,33 @@ z = var("z")
 print(f"sin(1+2i) = {sin(z).evaluate(z=1+2j)}")
 ```
 
+## LaTeX Output
+
+```python
+from uninum import var, sin, cos, exp, pi, to_latex
+
+x = var("x")
+theta = var("theta")
+
+# Basic expression
+expr = sin(x) / (x ** 2 + 1)
+print(to_latex(expr))
+# \frac{\sin\left(x\right)}{x^{2} + 1}
+
+# Greek variables are detected automatically
+expr2 = cos(theta) ** 2
+print(to_latex(expr2))
+# \cos\left(\theta\right)^{2}
+
+# Differentiate and render
+f = exp(x) * sin(x)
+df = f.diff(x).simplify()
+print(f"f'(x) = {to_latex(df)}")
+
+# Method syntax works too
+print(expr.to_latex())
+```
+
 ## Taylor Series Approximation
 
 Build an N-term Taylor expansion of a function around a point using repeated differentiation.
