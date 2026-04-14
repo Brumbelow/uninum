@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uninum"
+version = "0.1.0"
+description = "Unified symbolic-numeric expression runtime with EML lowering"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+numpy = ["numpy"]
+dev = ["pytest"]

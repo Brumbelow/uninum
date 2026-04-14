@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: uninum
+Version: 0.1.0
+Summary: Unified symbolic-numeric expression runtime with EML lowering
+Requires-Python: >=3.10
+Provides-Extra: numpy
+Requires-Dist: numpy; extra == "numpy"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"

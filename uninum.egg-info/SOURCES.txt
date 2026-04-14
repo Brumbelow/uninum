@@ -1,0 +1,17 @@
+pyproject.toml
+tests/test_compile.py
+tests/test_diff.py
+tests/test_eml.py
+tests/test_expr.py
+tests/test_simplify.py
+uninum/__init__.py
+uninum/compile.py
+uninum/diff.py
+uninum/eml.py
+uninum/expr.py
+uninum/simplify.py
+uninum.egg-info/PKG-INFO
+uninum.egg-info/SOURCES.txt
+uninum.egg-info/dependency_links.txt
+uninum.egg-info/requires.txt
+uninum.egg-info/top_level.txt
