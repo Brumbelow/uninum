@@ -8,7 +8,7 @@ EML stands for **Exp-Minus-Log**. It is the binary operator:
 eml(x, y) = exp(x) - ln(y)
 ```
 
-Odrzywolek (2024) showed that this single operator, combined with the constant 1, is sufficient to express **all elementary mathematical functions** -- arithmetic, powers, roots, exponentials, logarithms, trigonometry, and their inverses.
+Odrzywolek (2026) showed that this single operator, combined with the constant 1, is sufficient to express **all elementary mathematical functions** -- arithmetic, powers, roots, exponentials, logarithms, trigonometry, and their inverses.
 
 Every expression can be rewritten as a binary tree where:
 - Every **leaf** is either the constant `1` or a variable
